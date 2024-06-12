@@ -17,6 +17,7 @@ declare module 'vue' {
     ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
     ElDialog: typeof import('element-plus/es')['ElDialog']
     ElDivider: typeof import('element-plus/es')['ElDivider']
+    ElIcon: typeof import('element-plus/es')['ElIcon']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElInputNumber: typeof import('element-plus/es')['ElInputNumber']
     ElPopover: typeof import('element-plus/es')['ElPopover']
@@ -32,6 +33,7 @@ declare module 'vue' {
     SpeakText: typeof import('./src/components/editor-segment/SpeakText.vue')['default']
     SvgIcon: typeof import('./src/components/svg-icon/index.vue')['default']
     Test: typeof import('./src/components/editor-segment/test.vue')['default']
+    TestInput: typeof import('./src/components/editor-segment/TestInput.vue')['default']
     Toolbar: typeof import('./src/components/editor-segment/Toolbar.vue')['default']
   }
 }
