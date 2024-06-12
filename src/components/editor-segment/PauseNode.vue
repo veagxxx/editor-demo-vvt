@@ -2,10 +2,10 @@
   <NodeViewWrapper as="span" class="pause-node" :class="{ 'is-hover': node.attrs.isHover }">
     <PauseTooltip :time="displaySeconds" @pickPauseTime="onPauseTimeChange" @remove-time="onClose">
       <span 
-        v-if="displaySeconds" 
-        class="pause-node__wrapper" 
-        @mouseenter="toggleHoverStatus(true)" 
-        @mouseleave="toggleHoverStatus(false)" 
+        v-if="displaySeconds"
+        class="pause-node__wrapper"
+        @mouseenter="toggleHoverStatus(true)"
+        @mouseleave="toggleHoverStatus(false)"
       >
         <span class="pause-node__content--text">{{ displaySeconds }}s</span>
         <svg-icon iconClass="close" @click="onClose"></svg-icon>

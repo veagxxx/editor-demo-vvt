@@ -165,7 +165,6 @@ function onProduce()
 {
   if (props.output === 'xml')
   {
-    console.log('测试');
     console.log('ssml:', props.editor?.getHTML());
   }
   else
