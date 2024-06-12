@@ -89,15 +89,6 @@ function emitChange(value: string)
 {
   emit('update:modelValue', value);
 }
-
-// function transtorm2HTML()
-// {
-//   return editor.value?.getHTML();
-// }
-
-// defineExpose({
-//   getHTML: transtorm2HTML
-// });
 </script>
 <style lang="scss">
   .editor-segment-layout {
