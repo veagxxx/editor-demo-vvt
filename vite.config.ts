@@ -23,5 +23,8 @@ export default defineConfig(() => {
         iconDirs: [path.resolve(process.cwd(), 'src/assets/icons')],
       }),
     ],
+    server: {
+      port: 8080,
+    }
   };
 });
