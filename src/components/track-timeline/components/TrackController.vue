@@ -7,12 +7,13 @@
           :content="icon.title"
           placement="top"
         >
-          <el-icon>
+          <el-icon :class="{ 'disabled-icon': icon.disabled }">
             <svg-icon :icon-class="icon.icon" />
           </el-icon>
         </el-tooltip>
       </div>
     </div>
+    <span>{{ playTime }} / {{ allTime }}</span>
     <div class="slider-wrapper">
       <el-icon style="margin-right: 16px;" @click="changeScale(-10)">
         <svg-icon icon-class="substract" />
@@ -28,10 +29,12 @@
 <script lang="ts" setup>
 import { computed, PropType, reactive } from 'vue';
 import { useTrackState } from '../stores/track-state';
+import { formatPlayerTime } from '../utils/common';
+import { usePlayerState } from '../stores/player-state';
 // import { usePageState } from '../stores/page-state';
 interface IconItem {
   title: string;
-  disable: boolean;
+  disabled: boolean;
   icon: string;
 }
 const props = defineProps({
@@ -42,6 +45,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:modelValue']);
+const playerStore = usePlayerState();
 // const pageStore = usePageState();
 const trackStore = useTrackState();
 
@@ -52,6 +56,8 @@ const sliderProps = reactive({
   max: 100,
   min: 0
 });
+// const statePoint = computed(() => pageStore._stepInfo.statePoint);
+// const stateLength = computed(() => pageStore._stepInfo.stateLength);
 const modelValue = computed({
   get() {
     return props.modelValue;
@@ -63,30 +69,39 @@ const modelValue = computed({
 const icons = computed<IconItem[]>(() => [
   {
     title: '撤销',
-    disable: false,
+    // disable: stateLength.value === 0 || statePoint.value === 0,
+    disabled: true,
     icon: 'undo'
   },
   {
     title: '前进',
-    disable: false,
+    // disable: statePoint.value === stateLength.value,
+    disabled: true,
     icon: 'redo'
   },
   {
     title: '分割',
-    disable: false,
+    disabled: trackStore.selectTrackItem.line === -1 && trackStore.selectTrackItem.index === -1,
     icon: 'split'
   },
   {
     title: '删除',
-    disable: false,
+    disabled: trackStore.selectTrackItem.line === -1 && trackStore.selectTrackItem.index === -1,
     icon: 'delete',
   }
 ]);
 
+const playTime = computed(() => {
+    return formatPlayerTime(playerStore.playStartFrame);
+  });
+  const allTime = computed(() => {
+    return formatPlayerTime(playerStore.frameCount);
+  });
+
 function onIconClick(item: IconItem)
 {
-  const { icon, disable } = item;
-  if (disable) {
+  const { icon, disabled } = item;
+  if (disabled) {
     return;
   }
   if (icon === 'delete') {
@@ -130,13 +145,13 @@ function changeScale(value: number)
     border-color: rgb(75 85 99);
     display: flex;
     justify-content: space-between;
+    color: #b4b4b4;
     .icon-wrapper {
       display: flex;
       align-items: center;
       gap: 16px;
       height: 36px;
       line-height: 1;
-      color: #b4b4b4;
     }
     .slider-wrapper {
       width: 208px;
@@ -144,10 +159,13 @@ function changeScale(value: number)
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #b4b4b4;
     }
     .el-icon {
       cursor: pointer;
+      &.disabled-icon {
+        cursor: not-allowed;
+        color: #4b4b4b;
+      }
     }
   }
 </style>

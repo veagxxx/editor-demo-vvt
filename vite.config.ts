@@ -23,8 +23,27 @@ export default defineConfig(() => {
         iconDirs: [path.resolve(process.cwd(), 'src/assets/icons')],
       }),
     ],
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: `@use "@/assets/styles/element-plus/index.scss" as *;`
+        }
+      }
+    },
+    optimizeDeps: {
+      exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util']
+    },
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, 'src'),
+      }
+    },
     server: {
       port: 8080,
+      headers: {
+        'Cross-Origin-Opener-Policy': 'same-origin',
+        'Cross-Origin-Embedder-Policy': 'require-corp'
+      }
     }
   };
 });

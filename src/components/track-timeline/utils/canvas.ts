@@ -36,12 +36,12 @@ const getGridSize = (scale: number): number => {
     [80, 20],
     [70, 10],
     // 切换比例：最小单位为秒
-    [60, 80],
-    [50, 40],
+    [60, 40],
+    [50, 30],
     [40, 20],
     [30, 10],
     // 切换比例：最小单位为6秒 一大格为 1分钟
-    [20, 40],
+    [20, 30],
     [10, 25],
     [0, 10]
   ]);
@@ -103,7 +103,6 @@ export const drawTimeLine = (context: CanvasRenderingContext2D, userConfigs: Use
   const { start, scale, step: frameStep, focusPosition } = userConfigs;
   const { ratio, bgColor, width, height, textColor, subTextColor, textSize, textScale, focusColor, longColor, shortColor } = canvasConfigs;
   const step = getStep(scale, frameStep);
-
   // 初始化画布
   context.scale(ratio, ratio);
   context.clearRect(0, 0, width, height);
@@ -175,6 +174,9 @@ export const drawTimeLine = (context: CanvasRenderingContext2D, userConfigs: Use
   context.fillStyle = subTextColor;
   context.strokeStyle = shortColor;
   for (let value = startValueS, count = 0; value < endValue; value += gridSizeS, count++) {
+    if (count === 0) {
+      continue;
+    }
     const x = offsetXS + count * gridSizeS + lineWidth; // prevent canvas 1px line blurry
     context.moveTo(x, 0);
     const text = getShortText(value / gridSizeS, step, scale);

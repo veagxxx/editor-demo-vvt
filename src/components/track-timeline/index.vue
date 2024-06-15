@@ -28,7 +28,7 @@ const trackStyle = computed(() => {
     display: flex;
     flex-direction: column;
     padding-top: 8px;
-    width: 800px;
+    width: 90vw;
     border: 1px solid #E5E7EB;
     background-color: #282828;
   }

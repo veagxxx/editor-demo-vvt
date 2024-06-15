@@ -7,7 +7,7 @@
           class="icon-item" 
           :class="{ 'is-main': lineData.main }" 
           :style="{ height: TrackHeightMap.get(lineData.type) + 'px' }" 
-          title="主轨道"
+          :title="lineData.main ? '主轨道' : ''"
         >
           <el-icon>
             <svg-icon :icon-class="iconMap.get(lineData.type) || ''"></svg-icon>

@@ -1,6 +1,6 @@
 import { ref, toRefs, watch, reactive } from 'vue';
 import { defineStore } from 'pinia';
-import { useTrackState } from './track-state';
+import { useTrackState } from './track-state.ts';
 import type { VideoTractItem, TrackItem } from './track-state';
 import { useTrackAttrState } from './track-attribute';
 import { debounce } from 'lodash-es';

@@ -8,17 +8,17 @@
     <!-- 操作手柄 -->
     <TrackHandler :isActive="isActive" :lineIndex="lineIndex" :itemIndex="itemIndex" />
     <!-- 容器 -->
-    <!-- <component
-        :is="componentMap.get(trackItem.type)"
-        :trackItem="trackItem"
-    /> -->
-    {{ trackItem.source }}
+    <component
+      :is="componentMap.get(trackItem.type)"
+      :trackItem="trackItem"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-// import TrackHandler from '@/components/item/trackItem/TrackHandler.vue';
-
+import TrackHandler from './TrackHandler.vue';
+import VideoItem from './template/VideoItem.vue';
+import AudioItem from './template/AudioItem.vue';
 import { TrackHeightMap } from '../data/track-config';
 import { useTrackState } from '../stores/track-state';
 import { computed } from 'vue';
@@ -56,19 +56,14 @@ const itemClass = computed(() => {
 const isActive = computed(() => {
   return store.selectTrackItem.line === props.lineIndex && store.selectTrackItem.index === props.itemIndex;
 });
-// const componentMap = new Map([
-//   ['video', VideoItem],
-//   ['audio', AudioItem],
-//   ['text', TextItem],
-//   ['image', ImageItem],
-//   ['effect', EffectItem],
-//   ['transition', TransitionItem],
-//   ['filter', FilterItem]
-// ]);
+const componentMap = new Map<string, any>([
+  ['video', VideoItem],
+  ['audio', AudioItem],
+]);
 const isDragState = computed(() => {
   return store.moveTrackData.lineIndex === props.lineIndex && store.moveTrackData.itemIndex === props.itemIndex;
 });
-function setSelectTract(event:Event) {
+function setSelectTract(event: Event) {
   event.preventDefault();
   event.stopPropagation();
   store.selectTrackItem.line = props.lineIndex;

@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AudioItem: typeof import('./src/components/track-timeline/components/template/AudioItem.vue')['default']
     CameraNode: typeof import('./src/components/editor-segment/CameraNode.vue')['default']
     CameraNodePanel: typeof import('./src/components/editor-segment/CameraNodePanel.vue')['default']
     CameraNodePenal: typeof import('./src/components/editor-segment/CameraNodePenal.vue')['default']
@@ -24,6 +25,7 @@ declare module 'vue' {
     ElRow: typeof import('element-plus/es')['ElRow']
     ElSlider: typeof import('element-plus/es')['ElSlider']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
+    Loading: typeof import('./src/components/track-timeline/components/Loading.vue')['default']
     MotionNode: typeof import('./src/components/editor-segment/MotionNode.vue')['default']
     MotionNodePanel: typeof import('./src/components/editor-segment/MotionNodePanel.vue')['default']
     PauseNode: typeof import('./src/components/editor-segment/PauseNode.vue')['default']
@@ -46,5 +48,7 @@ declare module 'vue' {
     TrackList: typeof import('./src/components/track-timeline/components/TrackList.vue')['default']
     TrackPlayPoint: typeof import('./src/components/track-timeline/components/TrackPlayPoint.vue')['default']
     TrackTimeline: typeof import('./src/components/track-timeline/index.vue')['default']
+    VideoFrame: typeof import('./src/components/track-timeline/components/template/VideoFrame.vue')['default']
+    VideoItem: typeof import('./src/components/track-timeline/components/template/VideoItem.vue')['default']
   }
 }

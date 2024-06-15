@@ -15,10 +15,10 @@
         :focus-position="focusPosition"
         @select-frame="handlerSelectFrame"
       ></Timeline>
-      <div 
+      <div
         class="tracklist-container" 
         ref="trackListContainerRef" 
-        @dragover="trackListOverHandler($event, 'over')"
+        @dragover="trackListOverHandler($event)"
         @drop="addTrack"
       >
         <template v-if="showTrackList.length === 0">
@@ -30,7 +30,7 @@
           v-else
           class="tracklist-clips-wrapper"
           :style="{ width: `${trackStyle.width}px` }"
-          @click.self="handleMovePlayPoint"
+          @click="handleMovePlayPoint"
         >
           <template v-for="(lineData, lineIndex) in showTrackList" :key="lineIndex">
             <TrackClip
@@ -47,7 +47,14 @@
             />
           </template>
         </div>
-        <TrackPlayPoint v-show="showTrackList.length !== 0"></TrackPlayPoint>
+        <TrackPlayPoint 
+          v-show="showTrackList.length !== 0" 
+          :start="startX" 
+          :scale="trackScale" 
+          :step="defaultFps" 
+          :container="trackListRef"
+          @select-frame="handlerSelectFrame"
+        ></TrackPlayPoint>
         <div
           v-show="showTrackList.length !== 0 && dropItemLeft !== 0"
           class="drag-warning-line"
@@ -117,13 +124,12 @@ const showTrackList = computed<any[]>(() => {
       list: newList
     };
   });
-  console.log('result: ', result);
   return result;
 });
 
 function handleMovePlayPoint(event: MouseEvent)
 {
-  const offset = event.offsetX;
+  const offset = event.pageX - trackListRef.value.getBoundingClientRect().left;
   const frameIndex = getSelectFrame(startX.value + offset, trackScale.value, defaultFps.value);
   handlerSelectFrame(frameIndex);
 }
@@ -193,21 +199,20 @@ function dragLineHandler(event: DragEvent, type: string, lineIndex: number) {
     setDropLineLeft(event);
   }
 }
-  function trackListOverHandler(event: DragEvent, type = 'leave') {
-    console.log('dragover', type);
-    event.preventDefault();
-    event.stopPropagation();
-    setDropLineLeft(event);
+function trackListOverHandler(event: DragEvent) {
+  event.preventDefault();
+  event.stopPropagation();
+  setDropLineLeft(event);
+}
+function addTrack() {
+  let dragInfo = getJsonParse(store.dragData.dataInfo);
+  if (dragInfo) {
+    const startFrame = getSelectFrame(dropItemLeft.value, trackScale.value, defaultFps.value);
+    store.addTrack(formatTrackItemData(dragInfo, startFrame > 0 ? startFrame - 1 : 0), dropLineIndex.value, insertBefore.value, startFrame - 1);
   }
-  function addTrack() {
-    let dragInfo = getJsonParse(store.dragData.dataInfo);
-    if (dragInfo) {
-      const startFrame = getSelectFrame(dropItemLeft.value, trackScale.value, defaultFps.value);
-      store.addTrack(formatTrackItemData(dragInfo, startFrame > 0 ? startFrame - 1 : 0), dropLineIndex.value, insertBefore.value, startFrame - 1);
-    }
-    dropLineIndex.value = -1;
-    dropItemLeft.value = 0;
-  }
+  dropLineIndex.value = -1;
+  dropItemLeft.value = 0;
+}
 </script>
 
 <style lang="scss" scoped>

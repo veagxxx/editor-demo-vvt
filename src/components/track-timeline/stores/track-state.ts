@@ -110,6 +110,28 @@ const mockList = [
         "offsetR": 0
       }
     ]
+  },
+  {
+    "type": "audio",
+    "list": [
+      {
+        "type": "audio",
+        "cover": "/image/audio/audio_0.png",
+        "time": 25000,
+        "format": "mp3",
+        "name": "测试音频1",
+        "source": "/audio/audio_0.mp3",
+        "main": false,
+        "id": "t-8cfc2b04-cde2",
+        "start": 0,
+        "end": 750,
+        "offsetL": 0,
+        "offsetR": 0,
+        "frameCount": 750,
+        "showWidth": "1000px",
+        "showLeft": "0px"
+      }
+    ]
   }
 ]
 export const useTrackState = defineStore('trackState', () => {
@@ -205,12 +227,12 @@ export const useTrackState = defineStore('trackState', () => {
   }
   function selectTrackById(id: string) {
     trackList.forEach((item, index) => {
-        item.list.forEach((trackItem, trackIndex) => {
-          if (trackItem.id === id) {
-            selectTrackItem.line = index;
-            selectTrackItem.index = trackIndex;
-          }
-        });
+      item.list.forEach((trackItem, trackIndex) => {
+        if (trackItem.id === id) {
+          selectTrackItem.line = index;
+          selectTrackItem.index = trackIndex;
+        }
+      });
     });
   }
   // 新增元素
