@@ -16,14 +16,14 @@
 <script setup lang="ts">
 import Loading from '../Loading.vue';
 import type { PropType } from 'vue';
-import type { AudioTractItem } from '@/components/track-timeline/stores/track-state';
 import type FFmpegManager from '@/components/track-timeline/utils/ffmpeg-manager';
 import { usePlayerState } from '@/components/track-timeline/stores/player-state';
 import trackCheckPlaying from './track-check-playing';
 import { computed, inject, ref, watch } from 'vue';
+import { ITrackClipInComponent } from '@/components/track-timeline/types';
 const props = defineProps({
   trackItem: {
-    type: Object as PropType<AudioTractItem>,
+    type: Object as PropType<ITrackClipInComponent>,
     default() {
       return {
         showWidth: '0px',
@@ -35,24 +35,24 @@ const props = defineProps({
 const store = usePlayerState();
 store.ingLoadingCount++;
 const waveStyle = computed(() => {
-  const { start, end, offsetL, offsetR, frameCount } = props.trackItem;
-  const showFrameCount = end - start;
+  const { inFrame, outFrame, offsetLeft, offsetRight, frameCount } = props.trackItem;
+  const showFrameCount = outFrame - inFrame;
   return {
     transform: `scaleX(${(frameCount / showFrameCount).toFixed(2)})`,
     transformOrigin: 'left top',
-    left: `-${offsetL / showFrameCount * 100}%`,
-    right: `-${offsetR / showFrameCount * 100}%`
+    left: `-${offsetLeft / showFrameCount * 100}%`,
+    right: `-${offsetRight / showFrameCount * 100}%`
   };
 });
 const ffmpeg = inject('ffmpeg') as FFmpegManager;
 const loading = ref(true);
 const waveFileUrl = ref('');
 async function initAudio() {
-  const { name, source, format, frameCount } = props.trackItem;
-  if (name && source && ffmpeg.isLoaded.value) {
+  const { name, mediaURL, format, frameCount } = props.trackItem;
+  if (name && mediaURL && ffmpeg.isLoaded.value) {
     const audioName = `${name}.${format}`;
     // 写文件
-    await ffmpeg.writeFile(ffmpeg.pathConfig.resourcePath, audioName, source);
+    await ffmpeg.writeFile(ffmpeg.pathConfig.resourcePath, audioName, mediaURL);
     await ffmpeg.genWave(name, frameCount, format);
     waveFileUrl.value = await ffmpeg.getWavePng(name);
     loading.value = false;
@@ -60,9 +60,9 @@ async function initAudio() {
   }
 }
 watch(() => {
-  return props.trackItem.source && ffmpeg.isLoaded.value;
+  return props.trackItem.mediaURL && ffmpeg.isLoaded.value;
 }, initAudio, {
-  immediate: true
+  immediate: true,
 });
 trackCheckPlaying(props);
 </script>

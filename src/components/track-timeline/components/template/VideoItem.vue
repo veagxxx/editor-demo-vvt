@@ -4,20 +4,20 @@
       <el-icon style="display: inline-block; margin-right: 8px; flex-shrink: 0;">
         <svg-icon icon-class="video"></svg-icon>
       </el-icon>
-      <span>{{ `${trackItem.name}.${trackItem.format}` }}</span>
-      <span>{{ trackItem.time }}</span>
+      <span>{{ `${trackItem.name}` }}</span>
+      <span>{{ displayDuration }}</span>
     </div>
     <div ref="container" class="video-clip-wrapper">
-      <VideoFrame type="video" :trackItem="trackItem" :drawState="!loading" />
+      <VideoFrame type="video" :trackItem="trackItem" :nonLoading="!loading" />
     </div>
-    <div class="video-clip-image">
+    <!-- <div class="video-clip-image">
       <img 
         v-show="waveFileUrl" 
         :src="waveFileUrl" 
         :style="waveStyle" 
         alt=""
       />
-    </div>
+    </div> -->
     <Loading v-show="loading" class="loading-container" />
   </div>
 </template>
@@ -26,14 +26,15 @@
 import VideoFrame from './VideoFrame.vue';
 import Loading from '../Loading.vue';
 import type { PropType } from 'vue';
-import type { VideoTractItem } from '@/components/track-timeline/stores/track-state';
 import type FFmpegManager from '@/components/track-timeline/utils/ffmpeg-manager';
 import { usePlayerState } from '@/components/track-timeline/stores/player-state';
 import trackCheckPlaying from './track-check-playing';
 import { computed, inject, ref, watch } from 'vue';
+import { ITrackClipInComponent } from '../../types';
+import { formatPlayerTime } from '@/components/track-timeline/utils/common';
 const props = defineProps({
   trackItem: {
-    type: Object as PropType<VideoTractItem>,
+    type: Object as PropType<ITrackClipInComponent>,
     default() {
       return {
         showWidth: '0px',
@@ -47,23 +48,27 @@ store.ingLoadingCount++;
 const container = ref();
 const ffmpeg = inject('ffmpeg') as FFmpegManager;
 const loading = ref(true);
-const waveFileUrl = ref('');
-const waveStyle = computed(() => {
-  const { start, end, offsetL, offsetR, frameCount } = props.trackItem;
-  const showFrameCount = end - start;
-  return {
-    transform: `scaleX(${(frameCount / showFrameCount).toFixed(2)})`,
-    transformOrigin: 'left top',
-    left: `-${offsetL / showFrameCount * 100}%`,
-    right: `-${offsetR / showFrameCount * 100}%`
-  };
+// const waveFileUrl = ref('');
+// const waveStyle = computed(() => {
+//   const { inFrame, outFrame, offsetLeft, offsetRight, frameCount } = props.trackItem;
+//   const showFrameCount = outFrame - inFrame;
+//   return {
+//     transform: `scaleX(${(frameCount / showFrameCount).toFixed(2)})`,
+//     transformOrigin: 'left top',
+//     left: `-${offsetLeft / showFrameCount * 100}%`,
+//     right: `-${offsetRight / showFrameCount * 100}%`
+//   };
+// });
+const displayDuration = computed(() => {
+  return formatPlayerTime(props.trackItem.outFrame - props.trackItem.inFrame);
 });
 async function initVideo() {
-  const { name, source, format, frameCount, width, height } = props.trackItem;
-  if (name && source && ffmpeg.isLoaded.value) {
+  // const { name, mediaURL, format, frameCount, width = 0, height = 0 } = props.trackItem;
+  const { name, mediaURL, format, width = 0, height = 0 } = props.trackItem;
+  if (name && mediaURL && ffmpeg.isLoaded.value) {
     const videoName = `${name}.${format}`;
     // 写文件
-    await ffmpeg.writeFile(ffmpeg.pathConfig.resourcePath, videoName, source);
+    await ffmpeg.writeFile(ffmpeg.pathConfig.resourcePath, videoName, mediaURL);
     // 分离音频
     await ffmpeg.splitAudio(name, format);
     // 视频抽帧
@@ -71,14 +76,14 @@ async function initVideo() {
       w: width,
       h: height
     });
-    await ffmpeg.genWave(name, frameCount);
-    waveFileUrl.value = await ffmpeg.getWavePng(name);
+    // await ffmpeg.genWave(name, frameCount);
+    // waveFileUrl.value = await ffmpeg.getWavePng(name);
     loading.value = false;
     store.ingLoadingCount--;
   }
 }
 watch(() => {
-  return props.trackItem.source && ffmpeg.isLoaded.value;
+  return props.trackItem.mediaURL && ffmpeg.isLoaded.value;
 }, initVideo, {
   immediate: true,
   flush: 'post'
@@ -92,6 +97,9 @@ trackCheckPlaying(props);
     border-radius: 4px;
     overflow: hidden;
     height: 100%;
+    &:hover {
+      cursor: pointer;
+    }
     .video-clip-info {
       display: flex;
       align-items: center;

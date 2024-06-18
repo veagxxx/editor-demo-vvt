@@ -214,7 +214,6 @@ class FFmpegManager {
       audioPath = `${this.pathConfig.resourcePath}${sourceName}.${format}`;
     }
     const { commands, fileName } = this.baseCommand.genWave(audioPath, sourceName, this.pathConfig.wavePath, frameCount);
-    console.log('command: ', commands);
     const isFileExist = await this.fileExist(this.pathConfig.wavePath, fileName);
     if (force || !isFileExist) {
       await this.run(commands);
@@ -239,11 +238,11 @@ class FFmpegManager {
     const { commands } = this.baseCommand.genFrame(`${this.pathConfig.resourcePath}${filePath}`, framePath, size, format);
     try {
       await this.ffmpeg.exec(["-i", `${fileName}.webm`, `${fileName}.mp4`]);
-      await this.ffmpeg.exec(commands);
+      // await this.ffmpeg.exec(commands);
+      await this.run(commands);
     } catch (error) {
       console.log('error: ', error);
     }
-    // await this.run(commands);
     return { framePath };
   }
   /**

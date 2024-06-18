@@ -1,9 +1,9 @@
 import { ref, toRefs, watch, reactive } from 'vue';
 import { defineStore } from 'pinia';
 import { useTrackState } from './track-state.ts';
-import type { VideoTractItem, TrackItem } from './track-state';
 import { useTrackAttrState } from './track-attribute';
 import { debounce } from 'lodash-es';
+import { ITrackClipInComponent } from '../types/index.ts';
 
 export const usePlayerState = defineStore('playerState', () => {
   const trackStore = useTrackState();
@@ -16,31 +16,31 @@ export const usePlayerState = defineStore('playerState', () => {
     playerHeight: 0
   });
   const existVideo = ref(false);
-  const audioPlayData = ref<TrackItem[]>([]); // 全局音频，因为存在音频混合，所以将所有音频混合成一个
+  const audioPlayData = ref<ITrackClipInComponent[]>([]); // 全局音频，因为存在音频混合，所以将所有音频混合成一个
   function mergeVideo() {
     let existV = false;
     const endList: number[] = [0];
-    const vaList = <TrackItem[]>[];
+    const vaList = <ITrackClipInComponent[]>[];
     let playerWidth = 0; // 视频元素最大宽度
     let playerHeight = 0;// 视频元素最大高度
     let audioStart = -1; // 音频开始
     let audioEnd = -1; // 音频结束
     trackStore.trackList.forEach(trackLine => {
       let lineEnd = 0;
-      trackLine.list.forEach(trackItem => {
+      trackLine.trackClips.forEach(trackItem => {
         const silent = attrStore.trackAttrMap[trackItem.id]?.silent;
         if (trackLine.type === 'video') {
           if (playerHeight === 0 && playerWidth === 0) { // 取第一个视频宽高作为播放器宽高
-            playerWidth = Math.max(playerWidth, (trackItem as VideoTractItem).width);
-            playerHeight = Math.max(playerHeight, (trackItem as VideoTractItem).height);
+            playerWidth = Math.max(playerWidth, (trackItem as ITrackClipInComponent).width || 0);
+            playerHeight = Math.max(playerHeight, (trackItem as ITrackClipInComponent).height || 0);
           }
           existV = true;
         }
         if (!silent && (trackLine.type === 'video' || trackLine.type === 'audio')) {
           vaList.push(trackItem);
-          audioStart = Math.min(trackItem.start, audioStart);
-          audioEnd = Math.max(trackItem.end, audioEnd);
-          lineEnd = Math.max(lineEnd, trackItem.end); // 根据起止位置求出总长度
+          audioStart = Math.min(trackItem.inFrame, audioStart);
+          audioEnd = Math.max(trackItem.outFrame, audioEnd);
+          lineEnd = Math.max(lineEnd, trackItem.outFrame); // 根据起止位置求出总长度
         }
       });
       endList.push(lineEnd);

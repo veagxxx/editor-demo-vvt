@@ -41,8 +41,8 @@
               :lineType="lineData.type"
               :isActive="store.selectTrackItem.line === lineIndex"
               :lineIndex="lineIndex"
-              :isMain="lineData.main"
-              :line-data="lineData.list"
+              :isMain="lineData.mainTrack"
+              :line-data="lineData.trackClips"
               @dragover="dragLineHandler($event, 'over', lineIndex)"
             />
           </template>
@@ -71,10 +71,10 @@ import Timeline from './Timeline.vue';
 import TrackClip from './TrackClip.vue';
 import TrackPlayPoint from './TrackPlayPoint.vue';
 import { computed, ref } from 'vue';
-import { useTrackState, VideoTractItem } from '../stores/track-state';
+import { useTrackState } from '../stores/track-state';
 import globalDefault from '../global-default';
 import { getGridPixel, getSelectFrame } from '../utils/canvas';
-import { formatTime, getJsonParse, isVideo } from '../utils/common';
+import { getJsonParse } from '../utils/common';
 import { usePlayerState } from '../stores/player-state';
 import { formatTrackItemData } from '../utils/store';
 import { debounce } from 'lodash-es';
@@ -83,7 +83,7 @@ const playerStore = usePlayerState();
 const offset = {
   left: 10, // 容器 margin, 为了显示拖拽手柄
   right: 200
-  }
+}
 const trackListRef = ref();
 const trackListContainerRef = ref();
 const startX = ref(0 - offset.left);
@@ -109,19 +109,17 @@ const dragPoint = computed(() => store.dragData.dragPoint);
 let mainIndex = ref(0); // main 行下标
 const showTrackList = computed<any[]>(() => {
   const result = store.trackList.map((line, lineIndex) => {
-    line.main && (mainIndex.value = lineIndex);
-    const newList = line.list.map(item => {
-      const { time } = item as VideoTractItem;
+    line.mainTrack && (mainIndex.value = lineIndex);
+    const trackClips = line.trackClips.map(item => {
       return {
         ...item,
-        showWidth: `${getGridPixel(trackScale.value, item.end - item.start)}px`,
-        showLeft: `${getGridPixel(trackScale.value, item.start)}px`,
-        time: isVideo(line.type) ? `${formatTime(time || 0).str}` : ''
+        showWidth: `${getGridPixel(trackScale.value, item.outFrame - item.inFrame)}px`,
+        showLeft: `${getGridPixel(trackScale.value, item.inFrame)}px`,
       };
     });
     return {
       ...line,
-      list: newList
+      trackClips
     };
   });
   return result;

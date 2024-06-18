@@ -8,6 +8,10 @@ import 'element-plus/es/components/loading/style/css';
 import { createPinia } from 'pinia';
 import installFFmpeg from './plugin/ffmpeg-plugin'; // ffmpeg 集成
 import { ElLoading } from 'element-plus';
+import { useMock } from './mock';
+if (process.env.NODE_ENV === 'development') {
+  useMock();
+}
 
 const app = createApp(App);
 app.config.globalProperties.$ElLoading = ElLoading.service({

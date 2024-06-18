@@ -94,9 +94,9 @@ const icons = computed<IconItem[]>(() => [
 const playTime = computed(() => {
     return formatPlayerTime(playerStore.playStartFrame);
   });
-  const allTime = computed(() => {
-    return formatPlayerTime(playerStore.frameCount);
-  });
+const allTime = computed(() => {
+  return formatPlayerTime(playerStore.frameCount);
+});
 
 function onIconClick(item: IconItem)
 {

@@ -5,9 +5,9 @@
       <template v-for="(lineData, _) of listData" :key="lineData.type + _">
         <div 
           class="icon-item" 
-          :class="{ 'is-main': lineData.main }" 
+          :class="{ 'is-main': lineData.mainTrack }" 
           :style="{ height: TrackHeightMap.get(lineData.type) + 'px' }" 
-          :title="lineData.main ? '主轨道' : ''"
+          :title="lineData.mainTrack ? '主轨道' : ''"
         >
           <el-icon>
             <svg-icon :icon-class="iconMap.get(lineData.type) || ''"></svg-icon>
@@ -20,11 +20,11 @@
 
 <script setup lang="ts">
 import { PropType, ref, watch } from 'vue';
-import { TrackLineItemExt } from '../stores/track-state';
 import { TrackHeightMap } from '../data/track-config';
+import { ITimelineInComponent } from '../types';
 const props = defineProps({
   listData: {
-    type: Array as PropType<TrackLineItemExt[]>,
+    type: Array as PropType<ITimelineInComponent[]>,
     default() {
       return [];
     }

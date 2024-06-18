@@ -6,6 +6,7 @@ import globalDefault from '../global-default';
 import { getJsonParse } from '../utils/common';
 import { useTrackAttrState } from './track-attribute';
 import { checkTrackListOverlap } from '../utils/store';
+import { ITimelineInComponent, ITrackClipInComponent } from '../types';
 
 export type TrackType = 'video' | 'audio' | 'text' | 'image' | 'effect' | 'transition' | 'filter';
 interface BaseTractItem {
@@ -128,12 +129,11 @@ const mockList = [
         "offsetL": 0,
         "offsetR": 0,
         "frameCount": 750,
-        "showWidth": "1000px",
-        "showLeft": "0px"
       }
     ]
   }
 ]
+
 export const useTrackState = defineStore('trackState', () => {
   const attrStore = useTrackAttrState();
   const dragData = reactive({ // 拖拽数据
@@ -151,7 +151,8 @@ export const useTrackState = defineStore('trackState', () => {
   // 轨道放大比例
   const trackScale = ref(parseInt(localStorage.trackS) || globalDefault.track.scale);
   const localList = localStorage.trackList && getJsonParse(localStorage.trackList).legnth && getJsonParse(localStorage.trackList);
-  const trackList = reactive<TrackLineItem[]>(localList ? localList : mockList);
+  const trackList = ref<ITimelineInComponent[]>(localList ? localList : []);
+  // const timeline = reactive<ITimelineInComponent[]>([]);
 
   // 选中元素坐标
   const selectTrackItem = reactive({
@@ -163,42 +164,49 @@ export const useTrackState = defineStore('trackState', () => {
     if (selectTrackItem.line === -1) {
       return null;
     }
-    return trackList[selectTrackItem.line]?.list[selectTrackItem.index] || null;
+    return trackList.value[selectTrackItem.line]?.trackClips[selectTrackItem.index] || null;
   });
+
+  function setTrackList(timeline: ITimelineInComponent[], cover: boolean = true)
+  {
+    trackList.value = cover ? timeline : [...trackList.value, ...timeline];
+    localStorage.trackList = JSON.stringify(trackList);
+  }
+
   // 删除元素
   function removeTrack(lineIndex: number, itemIndex: number, removeAttr = true) {
-    const removeItem = trackList[lineIndex].list[itemIndex];
-    trackList[lineIndex].list.splice(itemIndex, 1);
-    if (trackList[lineIndex].list.length === 0 && !trackList[lineIndex].main) {
-      trackList.splice(lineIndex, 1);
+    const removeItem = trackList.value[lineIndex].trackClips[itemIndex];
+    trackList.value[lineIndex].trackClips.splice(itemIndex, 1);
+    if (trackList.value[lineIndex].trackClips.length === 0 && !trackList.value[lineIndex].mainTrack) {
+      trackList.value.splice(lineIndex, 1);
     }
-    if (trackList.length === 1 && trackList[0].list.length === 0) {
-      trackList.splice(0, 1);
+    if (trackList.value.length === 1 && trackList.value[0].trackClips.length === 0) {
+      trackList.value.splice(0, 1);
     }
     removeAttr && attrStore.deleteTrack(removeItem.id);
   }
   // 复用已有行
-  function insertExistingLine(item: TrackItem, insertLine: { line: number, index: number }) {
-    trackList[insertLine.line].list.splice(insertLine.index, 0, item);
+  function insertExistingLine(item: ITrackClipInComponent, insertLine: { line: number, index: number }) {
+    trackList.value[insertLine.line].trackClips.splice(insertLine.index, 0, item);
     selectTrackItem.line = insertLine.line;
     selectTrackItem.index = insertLine.index;
   }
   // 插入新行
-  function insertNewLine(item: TrackItem) {
+  function insertNewLine(item: ITrackClipInComponent) {
     const isVA = ['video', 'audio'].includes(item.type);
-    trackList[isVA ? 'push' : 'unshift']({
+    trackList.value[isVA ? 'push' : 'unshift']({
       type: item.type,
-      list: [item]
+      trackClips: [item]
     });
-    selectTrackItem.line = isVA ? trackList.length - 1 : 0;
+    selectTrackItem.line = isVA ? trackList.value.length - 1 : 0;
     selectTrackItem.index = 0;
   }
   // 移动目标行
-  function moveTargetLine(item: TrackItem, insertLine: { line: number, index: number }) {
+  function moveTargetLine(item: ITrackClipInComponent, insertLine: { line: number, index: number }) {
     let { lineIndex: moveLineIndex = -1, itemIndex: moveIndex = -1 } = moveTrackData;
-    trackList[insertLine.line].list.splice(insertLine.index, moveLineIndex === insertLine.line ? 1 : 0, item);
+    trackList.value[insertLine.line].trackClips.splice(insertLine.index, moveLineIndex === insertLine.line ? 1 : 0, item);
     if (moveLineIndex !== -1 && insertLine.line !== moveLineIndex) {
-      if (trackList[moveLineIndex].list.length === 1 && insertLine.line > moveLineIndex) {
+      if (trackList.value[moveLineIndex].trackClips.length === 1 && insertLine.line > moveLineIndex) {
         insertLine.line--; // 如果在移除元素前面插入，选中元素列上移
       }
       removeTrack(moveLineIndex, moveIndex, false);
@@ -207,17 +215,17 @@ export const useTrackState = defineStore('trackState', () => {
     selectTrackItem.index = moveLineIndex === -1 ? insertLine.index + 1 : insertLine.index;
   }
   // 目标行不可用，则移动到目标之后、之前
-  function moveLine(item: TrackItem, targetLineIndex: number) {
+  function moveLine(item: ITrackClipInComponent, targetLineIndex: number) {
     let { lineIndex: moveLineIndex = -1, itemIndex: moveIndex = -1 } = moveTrackData;
-    trackList.splice(targetLineIndex, 0, {
+    trackList.value.splice(targetLineIndex, 0, {
       type: item.type,
-      list: [item]
+      trackClips: [item]
     });
     if (moveLineIndex !== -1 && moveIndex !== -1) { // 移动到新行，删除老数据
       if (targetLineIndex < moveLineIndex) {
         moveLineIndex++; // 如果在移除元素前面插入，则移除下标自增
       }
-      if (trackList[moveLineIndex].list.length === 1 && targetLineIndex > moveLineIndex) {
+      if (trackList.value[moveLineIndex].trackClips.length === 1 && targetLineIndex > moveLineIndex) {
         targetLineIndex--; // 如果在移除元素前面插入，选中元素列上移
       }
       removeTrack(moveLineIndex, moveIndex, false);
@@ -226,8 +234,8 @@ export const useTrackState = defineStore('trackState', () => {
     selectTrackItem.index = 0;
   }
   function selectTrackById(id: string) {
-    trackList.forEach((item, index) => {
-      item.list.forEach((trackItem, trackIndex) => {
+    trackList.value.forEach((item, index) => {
+      item.trackClips.forEach((trackItem, trackIndex) => {
         if (trackItem.id === id) {
           selectTrackItem.line = index;
           selectTrackItem.index = trackIndex;
@@ -236,25 +244,25 @@ export const useTrackState = defineStore('trackState', () => {
     });
   }
   // 新增元素
-  function addTrack(item: TrackItem, lineIndex = -1, insertBefore = true, index = 0) {
+  function addTrack(item: ITrackClipInComponent, lineIndex = -1, insertBefore = true, index = 0) {
     const { type } = item;
     const isVA = ['video', 'audio'].includes(type);
     let { lineIndex: moveLineIndex = -1, itemIndex: moveIndex = -1 } = moveTrackData;
     // 插入main
-    if (trackList.length === 0) {
-      trackList.push({
+    if (trackList.value.length === 0) {
+      trackList.value.push({
         type: 'video',
-        main: true,
-        list: []
+        mainTrack: true,
+        trackClips: []
       });
     }
 
     let canInsertLines = []; // 可以承载新元素的行与下标
     // 找到最近的一个当前类型轨道, 使用 insertIndex 保持数组与实际顺序一致, 使用倒序从距离主轨道最近的轨道开始添加
-    let startIndex = isVA ? 0 : trackList.length - 1;
-    for (let i = startIndex; (isVA ? i < trackList.length : i > -1); isVA ? i++ : i--) {
-      const lineData = trackList[i];
-      const { hasOverlap, insertIndex } = checkTrackListOverlap(lineData.list, item, moveLineIndex === i ? moveIndex : -1);
+    let startIndex = isVA ? 0 : trackList.value.length - 1;
+    for (let i = startIndex; (isVA ? i < trackList.value.length : i > -1); isVA ? i++ : i--) {
+      const lineData = trackList.value[i];
+      const { hasOverlap, insertIndex } = checkTrackListOverlap(lineData.trackClips, item, moveLineIndex === i ? moveIndex : -1);
       if (lineData.type === type && !hasOverlap) { // 存在可复用行
         canInsertLines.push({
           line: i,
@@ -284,7 +292,7 @@ export const useTrackState = defineStore('trackState', () => {
     localStorage.trackS = trackScale.value;
   });
   watchEffect(() => {
-    localStorage.trackList = JSON.stringify(trackList);
+    localStorage.trackList = JSON.stringify(trackList.value);
   });
   return {
     moveTrackData,
@@ -295,6 +303,7 @@ export const useTrackState = defineStore('trackState', () => {
     addTrack,
     selectTrackById,
     removeTrack,
-    dragData
+    dragData,
+    setTrackList
   };
 });

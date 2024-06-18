@@ -50,7 +50,7 @@ const isActive = computed(() => {
 function dragLineHandler(event: DragEvent, type: string, lineIndex: number, index: number, dragType: string) {
   if (type === 'start') {
     playerStore.isPause = true;
-    store.dragData.dataInfo = JSON.stringify(store.trackList[lineIndex].list[index]);
+    store.dragData.dataInfo = JSON.stringify(store.trackList[lineIndex].trackClips[index]);
     store.dragData.dragType = dragType;
     store.dragData.dragPoint.x = event.offsetX;
     store.dragData.dragPoint.y = event.offsetY;

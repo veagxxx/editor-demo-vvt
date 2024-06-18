@@ -12,9 +12,9 @@
 <script setup lang="ts">
 import { useTrackState } from '../stores/track-state';
 import { usePlayerState } from '../stores/player-state';
-import type { TrackItem } from '../stores/track-state';
 import { computed } from 'vue';
 import { getGridPixel } from '../utils/canvas';
+import { ITrackClipInComponent } from '../types';
 
 const props = defineProps({
   isActive: {
@@ -33,7 +33,7 @@ const props = defineProps({
 const store = useTrackState();
 const playerStore = usePlayerState();
 const targetTrack = computed(() => {
-  return store.trackList[props.lineIndex].list[props.itemIndex];
+  return store.trackList[props.lineIndex].trackClips[props.itemIndex];
 });
 
 // 定位数据缓存
@@ -52,26 +52,32 @@ let handlerData = {
 };
 let enableMove = false;
 const frameWidth = computed(() => getGridPixel(store.trackScale, 1));
-function initLimits(lineData: TrackItem[], trackItem: TrackItem) {
+function initLimits(lineData: ITrackClipInComponent[], trackClipItem: ITrackClipInComponent) {
   const beforeTrack = props.itemIndex > 0 ? lineData[props.itemIndex - 1] : null;
   const afterTrack = props.itemIndex < lineData.length ? lineData[props.itemIndex + 1] : null;
-  const isVA = ['video', 'audio'].includes(trackItem.type);
+  const isVA = ['video', 'audio'].includes(trackClipItem.type);
   const limitData = {
     isVA,
-    start: trackItem.start,
-    end: trackItem.end,
-    offsetR: trackItem.offsetR,
-    offsetL: trackItem.offsetL,
-    minStart: beforeTrack ? beforeTrack.end : 0, // 可以调节的最小start
-    maxStart: trackItem.end - 1, // 最少要保留一帧数据
-    minEnd: trackItem.start + 1,
-    maxEnd: afterTrack ? afterTrack.start : (30 * 60 * 60) // 最长一小时
+    start: trackClipItem.inFrame,
+    end: trackClipItem.outFrame,
+    offsetR: trackClipItem.offsetRight,
+    offsetL: trackClipItem.offsetLeft,
+    minStart: beforeTrack ? beforeTrack.outFrame : 0, // 可以调节的最小start
+    maxStart: trackClipItem.outFrame - 1, // 最少要保留一帧数据
+    minEnd: trackClipItem.inFrame + 1,
+    maxEnd: afterTrack ? afterTrack.inFrame : (30 * 60 * 60) // 最长一小时
   };
   if (isVA) { // 音视频结尾受资源大小限制
-    const rightMaxWidth = (trackItem.frameCount - limitData.offsetL); // 右侧最大宽度
-    const leftMaxWidth = (trackItem.frameCount - limitData.offsetR);// 左侧最大宽度
-    limitData.maxEnd = afterTrack ? (Math.min(afterTrack.start, limitData.start + rightMaxWidth)) : Math.min(rightMaxWidth + limitData.start, (30 * 60 * 60));
-    limitData.minStart = beforeTrack ? (Math.max(beforeTrack.end, limitData.end - leftMaxWidth)) : Math.max(limitData.end - leftMaxWidth, 0);
+    const frameCount = trackClipItem.frameCount || 0;
+    const rightMaxWidth = (frameCount - limitData.offsetL); // 右侧最大宽度
+    const leftMaxWidth = (frameCount - limitData.offsetR);// 左侧最大宽度
+    limitData.maxEnd = afterTrack 
+      ? (Math.min(afterTrack.inFrame, limitData.start + rightMaxWidth)) 
+      : Math.min(rightMaxWidth + limitData.start, (30 * 60 * 60));
+
+    limitData.minStart = beforeTrack 
+      ? (Math.max(beforeTrack.outFrame, limitData.end - leftMaxWidth)) 
+      : Math.max(limitData.end - leftMaxWidth, 0);
   }
   Object.assign(handlerData, {
     ...limitData
@@ -82,6 +88,7 @@ function setTrackFrameData(frameCount: number, handleType: string) {
   const originWidth = originEnd - originStart;
   const leftMaxWidth = offsetL + originWidth;
   const rightMaxWidth = offsetR + originWidth;
+  const trackClip = store.trackList[props.lineIndex].trackClips[props.itemIndex];
   if (handleType === 'left') { // 操作左侧手柄
     let newStart = originStart + frameCount;
     if (newStart > maxStart) newStart = maxStart;
@@ -92,11 +99,11 @@ function setTrackFrameData(frameCount: number, handleType: string) {
         newStart = originEnd - leftMaxWidth;
         diffStart = newStart - originStart;
       }
-      store.trackList[props.lineIndex].list[props.itemIndex].offsetL = Math.max(offsetL + diffStart, 0);
+      trackClip.offsetLeft = Math.max(offsetL + diffStart, 0);
     } else { // 其他资源操作无限制
-      store.trackList[props.lineIndex].list[props.itemIndex].frameCount = originEnd - newStart;
+      trackClip.frameCount = originEnd - newStart;
     }
-    store.trackList[props.lineIndex].list[props.itemIndex].start = newStart;
+    trackClip.inFrame = newStart;
   } else { // 右侧手柄
     let newEnd = originEnd + frameCount;
     if (newEnd > maxEnd) newEnd = maxEnd;
@@ -106,11 +113,11 @@ function setTrackFrameData(frameCount: number, handleType: string) {
         newEnd = originStart + rightMaxWidth;
       }
       const diffEnd = newEnd - originEnd;
-      store.trackList[props.lineIndex].list[props.itemIndex].offsetR = Math.max(offsetR - diffEnd, 0);
+      trackClip.offsetRight = Math.max(offsetR - diffEnd, 0);
     } else { // 其他资源操作无限制
-      store.trackList[props.lineIndex].list[props.itemIndex].frameCount = newEnd - originStart;
+      trackClip.frameCount = newEnd - originStart;
     }
-    store.trackList[props.lineIndex].list[props.itemIndex].end = newEnd;
+    trackClip.outFrame = newEnd;
   }
 }
 
@@ -121,7 +128,7 @@ function mouseDownHandler(event: MouseEvent, type: string) {
   const { pageX: startX } = event;
   positionLeft = startX;
   enableMove = true;
-  initLimits(store.trackList[props.lineIndex]?.list || [], targetTrack.value);
+  initLimits(store.trackList[props.lineIndex]?.trackClips || [], targetTrack.value);
 
   document.onmousemove = documentEvent => {
     if (!enableMove) return;
@@ -148,6 +155,9 @@ function mouseDownHandler(event: MouseEvent, type: string) {
     bottom: 0;
     border: 1px solid #fff;
     z-index: 20;
+    &:hover {
+      cursor: pointer;
+    }
     &.is-active {
       border-color: rgb(243 244 246);
     }

@@ -1,3 +1,16 @@
+import globalDefault from "../global-default";
+
+/**
+ * 将帧数转化为秒数
+ * @param frameCount 帧数
+ * @param fps 帧率
+ * @returns 
+ */
+export function transferFrame2time(frameCount: number, fps = globalDefault.track.fps) {
+  const seconds = frameCount / fps;
+  return +seconds.toFixed(4);
+}
+
 // 生成 16 进制指定长度的字符串
 function getRandom(len: number) {
   return Math.floor((1 + Math.random()) * (16 ** len))
@@ -21,9 +34,9 @@ export function formatTime(time: number) {
     str: `${h === 0 ? '' : `${h < 10 ? '0' : ''}${h}:`}${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`
   };
 }
-export function formatPlayerTime(frameCount: number) {
-  let f = frameCount % 30;
-  frameCount = Math.floor(frameCount / 30);
+export function formatPlayerTime(frameCount: number, fps = globalDefault.track.fps) {
+  let f = frameCount % fps;
+  frameCount = Math.floor(frameCount / fps);
   let s = frameCount % 60;
   frameCount = Math.floor(frameCount / 60);
   let m = frameCount % 60;

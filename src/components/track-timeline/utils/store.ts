@@ -1,6 +1,6 @@
-import type { TrackItem } from '../stores/track-state';
 import { getId } from './common';
 import globalDefault from '../global-default';
+import { ITrackClipInComponent } from '../types';
 
 const baseFps = globalDefault.track.fps;
 /**
@@ -8,51 +8,52 @@ const baseFps = globalDefault.track.fps;
  * @param itemData 接口节点数据
  * @param startFrame 当前播放指针位置
  * */
-export function formatTrackItemData(itemData: Record<string, any>, startFrame: number): TrackItem {
-  let { time = 2000, type, frameCount, offsetL = 0, offsetR = 0, start = 0, end = 0, id = getId() } = itemData;
+export function formatTrackItemData(itemData: Record<string, any>, startFrame: number): ITrackClipInComponent {
+  let { duration, type, frameCount, offsetLeft = 0, offsetRight = 0, inFrame = 0, outFrame = 0, id = getId() } = itemData;
   if (type === 'video') {
-    time = frameCount ? parseInt(`${frameCount / baseFps * 1000}`) : time;
+    duration = frameCount ? frameCount / baseFps : duration;
   } else {
-    frameCount = baseFps * time / 1000;
+    frameCount = baseFps * duration;
   }
-  let originWidth = (start === 0 && end === 0) ? frameCount : (end - start);
+  let originWidth = (inFrame === 0 && outFrame === 0) ? frameCount : (outFrame - inFrame);
   let endFrame = startFrame + originWidth;
-  itemData.main = false;
   const trackItemData = {
     ...itemData,
     id,
-    start: startFrame,
-    end: endFrame,
-    offsetL,
-    offsetR,
-    time,
+    // in: transferFrame2time(startFrame, itemData.fps),
+    // out: transferFrame2time(endFrame, itemData.fps),
+    inFrame: startFrame,
+    outFrame: endFrame,
+    offsetLeft,
+    offsetRight,
+    duration,
     frameCount
   };
-  return trackItemData as TrackItem;
+  return trackItemData as ITrackClipInComponent;
 }
 
 /**
  * 检查 checkItem 是否与当前 trackList 存在帧重叠部分
  * */
-export function checkTrackListOverlap(trackList: TrackItem[], checkItem: TrackItem, moveIndex = -1) {
-  const { start: insertStart, end: insertEnd } = checkItem;
+export function checkTrackListOverlap(trackList: ITrackClipInComponent[], checkItem: ITrackClipInComponent, moveIndex = -1) {
+  const { inFrame: insertStart, outFrame: insertEnd } = checkItem;
   let overLapIndex = -1;
   let insertIndex = 0;
   const hasOverlap = trackList.some((trackItem, index) => {
     if (moveIndex !== -1 && index === moveIndex) { // 行内移动情况下忽略掉移动元素
       return false;
     }
-    const { start, end } = trackItem;
+    const { inFrame, outFrame } = trackItem;
     // 当前列表中元素 开始帧处于新元素内部，或结束帧处于新元素内部，则视为重叠
     if (
-      (start <= insertStart && end >= insertEnd) // 添加节点的开始和结束位置位于老节点外 或 两端相等
-      || (start >= insertStart && start < insertEnd) // 老节点开始位置在添加节点内部
-      || (end > insertStart && end <= insertEnd) // 老节点结束位置在添加节点内部
+      (inFrame <= insertStart && outFrame >= insertEnd) // 添加节点的开始和结束位置位于老节点外 或 两端相等
+      || (inFrame >= insertStart && inFrame < insertEnd) // 老节点开始位置在添加节点内部
+      || (outFrame > insertStart && outFrame <= insertEnd) // 老节点结束位置在添加节点内部
     ) {
       overLapIndex = index;
       return true;
     } else {
-      if (end <= insertStart) {
+      if (outFrame <= insertStart) {
         insertIndex = index + 1;
       }
       return false;
