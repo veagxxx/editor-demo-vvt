@@ -58,23 +58,29 @@ const trackScale = computed(() => store.trackScale);
  * @param margin 图像间距
  * */
 function drawBitmap(imageBitmap: ImageBitmap, drawIndex = 0, margin = 0) {
+  // const { width: containerWidth } = canvasAttr; 
   const { width, height } = drawSize;
   const { width: imageW = 0, height: imageH = 0 } = props.trackItem;
   canvasContext.drawImage(imageBitmap, 0, 0, imageW, imageH, drawIndex * (width + margin), 0, width, height);
+  // if (drawIndex === maxFrame - 1) { // 最后一张顶头渲染
+  //   canvasContext.drawImage(imageBitmap, 0, 0, imageW, imageH, containerWidth - width, 0, width, height);
+  // } else {
+  //   canvasContext.drawImage(imageBitmap, 0, 0, imageW, imageH, drawIndex * (width + margin), 0, width, height);
+  // }
 }
 // 绘制图像
 async function drawImage() {
-  if (canvasImage.value && canvas.value.width) {
-    await nextTick();
-    const x = getGridPixel(trackScale.value, props.trackItem.offsetLeft);
-    canvasContext.clearRect(0, 0, canvas.value.width, canvas.value.height);
-    canvasContext.putImageData(canvasImage.value, 0, 0, 0, 0, canvas.value.width, canvas.value.height);
-    if (x > 0) {
-      const imageData = canvasContext.getImageData(0, 0, canvas.value.width, canvas.value.height);
-      canvasContext.putImageData(imageData, 0, 0);
-    }
-    return;
-  }
+  // if (canvasImage.value && canvas.value.width) {
+  //   await nextTick();
+  //   const x = getGridPixel(trackScale.value, props.trackItem.offsetLeft);
+  //   canvasContext.clearRect(0, 0, canvas.value.width, canvas.value.height);
+  //   canvasContext.putImageData(canvasImage.value, 0, 0, 0, 0, canvas.value.width, canvas.value.height);
+  //   if (x > 0) {
+  //     const imageData = canvasContext.getImageData(x, 0, canvas.value.width, canvas.value.height);
+  //     canvasContext.putImageData(imageData, 0, 0);
+  //   }
+  //   return;
+  // }
   if (props.trackItem.name && props.nonLoading && ffmpeg.isLoaded.value) {
     const { width: containerWidth } = canvasAttr;
     const { maxFrame, width, frameCount } = drawSize;
@@ -113,12 +119,11 @@ function setCanvasContext() {
 // 设置 canvas 大小
 function setCanvasRect() {
   const { inFrame, outFrame, width: frameW = 0, height: frameH = 0 } = props.trackItem;
-  const showFrameCount = outFrame - inFrame;
+  const showFrameCount = outFrame - inFrame - 1;
   const { width, height } = frameContainer.value.getBoundingClientRect();
   canvasAttr.width = width;
   canvasAttr.height = height;
   if (!canvasAttr.originWidth) {
-    console.log('widt', width);
     canvasAttr.originWidth = width;
   }
   const scaleW = Math.ceil(frameW / (frameH / height));

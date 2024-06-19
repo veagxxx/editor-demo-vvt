@@ -92,7 +92,7 @@ watch(() => props.offsetTop, () => {
         margin-top: 4px;
         color: #b4b4b4;
         &.is-main {
-          background-color: rgb(59 130 246 / 0.2);
+          background-color: #3c3c3c;
         }
       }
     }

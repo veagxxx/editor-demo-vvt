@@ -2,7 +2,7 @@ export default {
   timeline: {
     ratio: window.devicePixelRatio || 1, // 设备像素比
     // bgLightColor: '#E5E7EB',
-    bgColor: '#374151', // 背景颜色
+    bgColor: '#282828', // 背景颜色
     textSize: 12, // 字号
     textScale: 0.83, // 支持更小号字： 10 / 12
     lineWidth: 1, // 线宽

@@ -54,6 +54,7 @@ export class Command { // 命令封装
     } else {
       const fileName = '/pic-%d.jpg';
       return {
+        // commands: ['-i', filePath, '-vf', `fps=${fps}`, '-s', `${size.w}x${size.h}`, `${framePath}${fileName}`]
         commands: ['-i', filePath, '-vf', `fps=${fps}`, '-s', `${size.w}x${size.h}`, `${framePath}${fileName}`]
       };
     }
@@ -76,7 +77,7 @@ export class Command { // 命令封装
   genWave(audioPath: string, videoName: string, wavePath: string, frameCount: number) {
     const fileName = `${videoName}.png`;
     return {
-      commands: ['-i', audioPath, '-filter_complex', `aformat=channel_layouts=mono,compand,showwavespic=s=${frameCount * 5}x32:colors=yellow`, '-frames:v', '1', `${wavePath}${fileName}`],
+      commands: ['-i', audioPath, '-filter_complex', `aformat=channel_layouts=mono,compand,showwavespic=s=${frameCount * 5}x32:colors=#007b61`, '-frames:v', '1', `${wavePath}${fileName}`],
       fileName
     };
   }

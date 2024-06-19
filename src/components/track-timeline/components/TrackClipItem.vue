@@ -12,6 +12,10 @@
       :is="componentMap.get(trackItem.type)"
       :trackItem="trackItem"
     />
+    <div class="trackclip-item--info" v-show="isActive">
+      <div class="clip-name">{{ trackItem.name }}</div>
+      <div class="clip-time">{{ displayDuration }}</div>
+    </div>
   </div>
 </template>
 
@@ -22,6 +26,7 @@ import AudioItem from './template/AudioItem.vue';
 import { TrackHeightMap } from '../data/track-config';
 import { useTrackState } from '../stores/track-state';
 import { computed } from 'vue';
+import { formatPlayerTime } from '../utils/common';
 const props = defineProps({
   trackType: {
     type: String,
@@ -46,6 +51,9 @@ const props = defineProps({
   }
 });
 const store = useTrackState();
+const displayDuration = computed(() => {
+  return formatPlayerTime(props.trackItem.outFrame - props.trackItem.inFrame);
+});
 const itemClass = computed(() => {
   return {
     width: props.trackItem.showWidth,
@@ -79,6 +87,22 @@ function setSelectTract(event: Event) {
     color: #b4b4b4;
     &.is-dragstate {
       opacity: 0.3;
+    }
+    .trackclip-item--info {
+      position: absolute;
+      top: -22px;
+      font-size: 12px;
+      height: 18px;
+      z-index: 99;
+      display: flex;
+      gap: 6px;
+      & > div {
+        white-space: nowrap;
+        background-color: #3c3c3c;
+        padding: 2px 4px;
+        border-radius: 4px;
+        height: 100%;
+      }
     }
   }
 </style>

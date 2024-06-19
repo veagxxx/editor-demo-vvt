@@ -4,6 +4,7 @@ import { reactive, ref, watch } from "vue";
 import { FileTypeMap } from './constants';
 import { TrackItem } from '../stores/track-state';
 import { Command } from './ffmpeg-command';
+import globalDefault from '../global-default';
 
 const baseURL = 'https://unpkg.com/@ffmpeg/core-mt@0.12.4/dist/esm';
 
@@ -214,6 +215,7 @@ class FFmpegManager {
       audioPath = `${this.pathConfig.resourcePath}${sourceName}.${format}`;
     }
     const { commands, fileName } = this.baseCommand.genWave(audioPath, sourceName, this.pathConfig.wavePath, frameCount);
+    console.log('commands', commands);
     const isFileExist = await this.fileExist(this.pathConfig.wavePath, fileName);
     if (force || !isFileExist) {
       await this.run(commands);
@@ -236,6 +238,7 @@ class FFmpegManager {
     };
     this.mkdir([framePath]);
     const { commands } = this.baseCommand.genFrame(`${this.pathConfig.resourcePath}${filePath}`, framePath, size, format);
+    console.log('command: ', commands);
     try {
       await this.ffmpeg.exec(["-i", `${fileName}.webm`, `${fileName}.mp4`]);
       // await this.ffmpeg.exec(commands);

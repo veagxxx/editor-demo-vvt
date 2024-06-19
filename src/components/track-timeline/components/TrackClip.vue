@@ -72,7 +72,7 @@ function dragLineHandler(event: DragEvent, type: string, lineIndex: number, inde
       background-color: rgb(243 244 246 / 0.2);
     }
     &.is-main {
-      background-color: rgb(59 130 246 / 0.2);
+      background-color: #323232;
     }
   }
   .showLine-t::after {

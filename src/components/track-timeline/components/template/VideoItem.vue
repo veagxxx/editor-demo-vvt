@@ -1,23 +1,8 @@
 <template>
   <div class="video-clip-container">
-    <div class="video-clip-info">
-      <el-icon style="display: inline-block; margin-right: 8px; flex-shrink: 0;">
-        <svg-icon icon-class="video"></svg-icon>
-      </el-icon>
-      <span>{{ `${trackItem.name}` }}</span>
-      <span>{{ displayDuration }}</span>
-    </div>
     <div ref="container" class="video-clip-wrapper">
       <VideoFrame type="video" :trackItem="trackItem" :nonLoading="!loading" />
     </div>
-    <!-- <div class="video-clip-image">
-      <img 
-        v-show="waveFileUrl" 
-        :src="waveFileUrl" 
-        :style="waveStyle" 
-        alt=""
-      />
-    </div> -->
     <Loading v-show="loading" class="loading-container" />
   </div>
 </template>
@@ -29,9 +14,8 @@ import type { PropType } from 'vue';
 import type FFmpegManager from '@/components/track-timeline/utils/ffmpeg-manager';
 import { usePlayerState } from '@/components/track-timeline/stores/player-state';
 import trackCheckPlaying from './track-check-playing';
-import { computed, inject, ref, watch } from 'vue';
+import { inject, ref, watch } from 'vue';
 import { ITrackClipInComponent } from '../../types';
-import { formatPlayerTime } from '@/components/track-timeline/utils/common';
 const props = defineProps({
   trackItem: {
     type: Object as PropType<ITrackClipInComponent>,
@@ -48,22 +32,8 @@ store.ingLoadingCount++;
 const container = ref();
 const ffmpeg = inject('ffmpeg') as FFmpegManager;
 const loading = ref(true);
-// const waveFileUrl = ref('');
-// const waveStyle = computed(() => {
-//   const { inFrame, outFrame, offsetLeft, offsetRight, frameCount } = props.trackItem;
-//   const showFrameCount = outFrame - inFrame;
-//   return {
-//     transform: `scaleX(${(frameCount / showFrameCount).toFixed(2)})`,
-//     transformOrigin: 'left top',
-//     left: `-${offsetLeft / showFrameCount * 100}%`,
-//     right: `-${offsetRight / showFrameCount * 100}%`
-//   };
-// });
-const displayDuration = computed(() => {
-  return formatPlayerTime(props.trackItem.outFrame - props.trackItem.inFrame);
-});
+
 async function initVideo() {
-  // const { name, mediaURL, format, frameCount, width = 0, height = 0 } = props.trackItem;
   const { name, mediaURL, format, width = 0, height = 0 } = props.trackItem;
   if (name && mediaURL && ffmpeg.isLoaded.value) {
     const videoName = `${name}.${format}`;
@@ -76,8 +46,6 @@ async function initVideo() {
       w: width,
       h: height
     });
-    // await ffmpeg.genWave(name, frameCount);
-    // waveFileUrl.value = await ffmpeg.getWavePng(name);
     loading.value = false;
     store.ingLoadingCount--;
   }
@@ -100,43 +68,11 @@ trackCheckPlaying(props);
     &:hover {
       cursor: pointer;
     }
-    .video-clip-info {
-      display: flex;
-      align-items: center;
-      padding-left: 8px;
-      font-size: 12px;
-      height: 20px;
-      line-height: 20px;
-      color: rgb(229 231 235);
-      background-color: rgb(107, 114, 128, 0.4);
-      overflow: hidden;
-      span {
-        margin-right: 16px;
-        flex-shrink: 0;
-      }
-    }
     .video-clip-wrapper {
       position: relative;
       overflow: hidden;
       background-color: rgba(107, 114, 128, 0.7);
       flex: 1;
-    }
-    .video-clip-image {
-      position: relative;
-      height: 12px;
-      line-height: 12px;
-      padding-left: 8px;
-      overflow: hidden;
-      background-color: rgb(55, 65, 81);
-      img {
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        min-width: 100%;
-        height: 100%;
-      }
     }
     .loading-container {
       padding-left: 48px;

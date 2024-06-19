@@ -1,11 +1,5 @@
 <template>
   <div class="audio-clip-container">
-    <div class="audio-clip-info">
-      <el-icon style="display: inline-block; margin-right: 8px; flex-shrink: 0;">
-        <svg-icon icon-class="audio"></svg-icon>
-      </el-icon>
-      <span>{{ `${trackItem.name}.${trackItem.format}` }}</span>
-    </div>
     <div class="audio-clip-image">
       <img :src="waveFileUrl" v-show="waveFileUrl" :style="waveStyle" alt="">
     </div>
@@ -73,27 +67,12 @@ trackCheckPlaying(props);
     border-radius: 4px;
     overflow: hidden;
     height: 100%;
-    .audio-clip-info {
-      display: flex;
-      align-items: center;
-      padding-left: 8px;
-      font-size: 12px;
-      height: 20px;
-      line-height: 20px;
-      color: rgb(229 231 235);
-      background-color: rgb(107, 114, 128, 0.4);
-      overflow: hidden;
-      span {
-        margin-right: 16px;
-        flex-shrink: 0;
-      }
-    }
     .audio-clip-image {
       position: relative;
       flex: 1;
       padding-left: 8px;
       overflow: hidden;
-      background-color: rgb(55, 65, 81);
+      background-color: #1f4d43;
       img {
         position: absolute;
         left: 0;

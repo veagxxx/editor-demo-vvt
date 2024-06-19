@@ -153,13 +153,14 @@ function mouseDownHandler(event: MouseEvent, type: string) {
     right: 0;
     top: 0;
     bottom: 0;
-    border: 1px solid #fff;
+    border: 2px solid #fff;
     z-index: 20;
+    border-radius: 4px;
     &:hover {
       cursor: pointer;
     }
     &.is-active {
-      border-color: rgb(243 244 246);
+      border-color: rgb(243, 244, 246, 0.8);
     }
     &--left {
       cursor: col-resize;
@@ -169,12 +170,12 @@ function mouseDownHandler(event: MouseEvent, type: string) {
       position: absolute;
       top: -1px;
       bottom: -1px;
-      left: -8px;
+      left: 0px;
       text-align: center;
       border-top-left-radius: 4px;
       border-bottom-left-radius: 4px;
       width: 8px;
-      background-color: rgb(243 244 246);;
+      background-color: rgba(243, 244, 246, 0.5);
       color: rgb(31 41 55);
     }
     &--right {
@@ -185,12 +186,12 @@ function mouseDownHandler(event: MouseEvent, type: string) {
       position: absolute;
       top: -1px;
       bottom: -1px;
-      right: -8px;
+      right: 0px;
       text-align: center;
       border-top-right-radius: 4px;
       border-bottom-right-radius: 4px;
       width: 8px;
-      background-color: rgb(243 244 246);
+      background-color: rgba(243, 244, 246, 0.5);
       color: rgb(31 41 55);
     }
   }

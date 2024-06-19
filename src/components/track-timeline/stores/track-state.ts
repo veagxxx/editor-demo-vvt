@@ -87,53 +87,6 @@ export interface TrackLineItemExt {
   list: TrackItemExt[];
 }
 
-const mockList = [
-  {
-    "type": "video",
-    "main": true,
-    "list": [
-      {
-        "type": "video",
-        "name": "video_1",
-        "format": "mp4",
-        "cover": "/image/video/video_1.png",
-        "source": "/video/video_1.mp4",
-        "width": 1232,
-        "height": 720,
-        "fps": 30,
-        "frameCount": 712,
-        "time": 23733,
-        "main": false,
-        "id": "t-5f711984-9383",
-        "start": 0,
-        "end": 712,
-        "offsetL": 0,
-        "offsetR": 0
-      }
-    ]
-  },
-  {
-    "type": "audio",
-    "list": [
-      {
-        "type": "audio",
-        "cover": "/image/audio/audio_0.png",
-        "time": 25000,
-        "format": "mp3",
-        "name": "测试音频1",
-        "source": "/audio/audio_0.mp3",
-        "main": false,
-        "id": "t-8cfc2b04-cde2",
-        "start": 0,
-        "end": 750,
-        "offsetL": 0,
-        "offsetR": 0,
-        "frameCount": 750,
-      }
-    ]
-  }
-]
-
 export const useTrackState = defineStore('trackState', () => {
   const attrStore = useTrackAttrState();
   const dragData = reactive({ // 拖拽数据
