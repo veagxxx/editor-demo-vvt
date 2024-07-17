@@ -14,7 +14,6 @@ declare module 'vue' {
     ElCol: typeof import('element-plus/es')['ElCol']
     ElDialog: typeof import('element-plus/es')['ElDialog']
     ElDivider: typeof import('element-plus/es')['ElDivider']
-    ElFocusTrap: typeof import('element-plus/es')['ElFocusTrap']
     ElIcon: typeof import('element-plus/es')['ElIcon']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElOverlay: typeof import('element-plus/es')['ElOverlay']
@@ -26,6 +25,5 @@ declare module 'vue' {
     SegmentNode: typeof import('./src/components/editor-segment/SegmentNode.vue')['default']
     SpeakText: typeof import('./src/components/editor-segment/SpeakText.vue')['default']
     SvgIcon: typeof import('./src/components/svg-icon/index.vue')['default']
-    Test: typeof import('./src/components/test/index.vue')['default']
   }
 }
