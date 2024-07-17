@@ -58,6 +58,13 @@ export default defineConfig(({ mode }) => {
           ws: true,
           secure: false,
           rewrite: path => path.replace(/^\/api/, ''),
+        },
+        '/api': {
+          target: 'http://localhost:9999',
+          changeOrigin: true,
+          ws: true,
+          secure: false,
+          rewrite: path => path.replace(/^\/api/, ''),
         }
       }
     }

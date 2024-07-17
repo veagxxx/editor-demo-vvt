@@ -1,50 +1,53 @@
 <script setup lang="ts">
-// import EditorSegment from './components/editor-segment/index.vue';
-import TrackTimeline from './components/track-timeline/index.vue';
-import { ITimeline } from './components/track-timeline/types';
-// import { ref } from 'vue';
-// const content = ref('<speak volume="50" rate="0">朋友们&lt;&gt;你们好，今&amp;天，我来带<hmotion duration="2" code="man001_indicate_low_right"></hmotion>大家一起欢迎走进木结构建筑的世界。</speak>');
-const mockTimeline: ITimeline[] = [
-  {
-    type: 'video',
-    mainTrack: true,
-    trackClips: [
-      {
-        id: 't-5f711984-9383',
-        name: '测试视频.mp4',
-        type: 'video',
-        mediaId: 't-5f711984-9383',
-        mediaURL: 'https://z.gtimg.com/szg_1000114_0bc3haaa2aaaoqag2egvzzrmuogdbu4aadka.f207110.mp4?dis_k=2b0e489be1dbfb784865cae2cd388120&dis_t=1718780197',
-        in: 0,
-        out: 69.0983,
-        duration: 69.0983,
-        fps: 30,
-        width: 1232,
-        height: 720,
+import { ref } from 'vue';
+import { ZMessageBox } from './components/message-box';
+import EditorSegment from './components/editor-segment/index.vue';
+import { h } from 'vue';
+// import TrackTimeline from './components/track-timeline/index.vue';
+// import { ITimeline } from './components/track-timeline/types';
+
+const content = ref('<speak volume="50" rate="0">朋友们&lt;&gt;你们好，今&amp;天，我来带<hmotion duration="2" code="man001_indicate_low_right"></hmotion>大家一起欢迎走进木结构建筑的世界。</speak>');
+
+function onTest()
+{
+  ZMessageBox({
+    title: '提示',
+    type: 'warning',
+    boxType: 'alert',
+    showCancelButton: false,
+    showConfirmButton: false,
+    message: h('span', { style: { color: 'var(--el-color-primary)' } }, 'hello world'),
+    beforeClose: (action, vm, done) => {
+      console.log('before close', action, vm, done);
+      done();
+    },
+    footers: [{
+      buttonText: '取消',
+      action: 'cancel'
+    }, {
+      buttonText: '确认',
+      action: 'confirm'
+    }, {
+      buttonText: '自定义',
+      buttonType: 'primary',
+      onClick: (e, done) => {
+        console.log('confirm', e);
+        done();
       },
-    ]
-  },
-  {
-    type: 'audio',
-    trackClips: [
-      {
-        id: 't-8cfc2b04-cde2',
-        type: 'audio',
-        name: '测试音频1',
-        mediaId: 't-8cfc2b04-cde2',
-        mediaURL: '/audio/audio_0.mp3',
-        in: 0,
-        out: 25,
-        duration: 25,
-      }
-    ]
-  }
-]
+    }],
+  })
+  .then(() => {
+    console.log('then');
+  })
+  .catch(() => {
+    console.log('catch');
+  });
+}
 </script>
 
 <template>
-  <!-- <editor-segment v-model="content"></editor-segment> -->
-  <TrackTimeline :track-list="mockTimeline"></TrackTimeline>
+  <el-button @click="onTest">测试</el-button>
+  <editor-segment v-model="content"></editor-segment>
 </template>
 
 <style scoped></style>
