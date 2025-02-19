@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Canvas Drag and Scroll</title>
+    <style>
+      canvas {
+        border: 1px solid black;
+        width: 500px;
+        height: 500px;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="myCanvas"></canvas>
+
+    <script>
+      const canvas = document.getElementById("myCanvas");
+      const ctx = canvas.getContext("2d");
+
+      // 设置画布的宽度和高度
+      canvas.width = 500;
+      canvas.height = 500;
+
+      // 定义初始变换矩阵
+      let transform = {
+        x: 0,
+        y: 0,
+        scale: 1,
+      };
+
+      // 记录拖拽状态
+      let isDragging = false;
+      let startX, startY;
+
+      // 绘制一些示例内容
+      function draw() {
+        // 应用变换矩阵
+        ctx.setTransform(1, 0, 0, 1, 0, 0); // 重置变换
+        ctx.translate(transform.x, transform.y);
+        ctx.scale(transform.scale, transform.scale);
+
+        // 绘制一个大矩形（模拟大尺寸内容）
+        ctx.fillStyle = "lightblue";
+        ctx.fillRect(-500, -500, 2000, 2000); // 大矩形，超出画布范围
+
+        // 绘制一些文本
+        ctx.fillStyle = "black";
+        ctx.font = "24px Arial";
+        ctx.fillText("拖拽以滚动画布", 100, 100);
+      }
+
+      // 初始绘制
+      draw();
+
+      // 鼠标按下事件
+      canvas.addEventListener("mousedown", (event) => {
+        isDragging = true;
+        startX = event.clientX;
+        startY = event.clientY;
+      });
+
+      // 鼠标移动事件
+      canvas.addEventListener("mousemove", (event) => {
+        if (isDragging) {
+          const dx = event.clientX - startX;
+          const dy = event.clientY - startY;
+
+          // 更新变换矩阵
+          transform.x += dx;
+          transform.y += dy;
+
+          // 重新绘制
+          draw();
+
+          // 更新起始位置
+          startX = event.clientX;
+          startY = event.clientY;
+        }
+      });
+
+      // 鼠标松开事件
+      canvas.addEventListener("mouseup", () => {
+        isDragging = false;
+      });
+
+      // 鼠标离开画布事件
+      canvas.addEventListener("mouseleave", () => {
+        isDragging = false;
+      });
+
+      // 触摸事件支持（移动端）
+      canvas.addEventListener("touchstart", (event) => {
+        event.preventDefault(); // 阻止默认行为（如页面滚动）
+
+        isDragging = true;
+        startX = event.touches[0].clientX;
+        startY = event.touches[0].clientY;
+      });
+
+      canvas.addEventListener("touchmove", (event) => {
+        event.preventDefault(); // 阻止默认行为（如页面滚动）
+
+        if (isDragging) {
+          const dx = event.touches[0].clientX - startX;
+          const dy = event.touches[0].clientY - startY;
+
+          // 更新变换矩阵
+          transform.x += dx;
+          transform.y += dy;
+
+          // 重新绘制
+          draw();
+
+          // 更新起始位置
+          startX = event.touches[0].clientX;
+          startY = event.touches[0].clientY;
+        }
+      });
+
+      canvas.addEventListener("touchend", () => {
+        isDragging = false;
+      });
+
+      // 鼠标滚轮事件
+      canvas.addEventListener("wheel", (event) => {
+        // 阻止默认行为（如页面滚动）
+        event.preventDefault();
+
+        // 检查是否按下了 Ctrl 键
+        if (event.ctrlKey) {
+          // 获取当前鼠标位置（相对于画布左上角）
+          const mouseX = event.clientX - canvas.offsetLeft;
+          const mouseY = event.clientY - canvas.offsetTop;
+
+          // 计算缩放前的鼠标位置（相对于画布内容）
+          const prevMouseX = (mouseX - transform.x) / transform.scale;
+          const prevMouseY = (mouseY - transform.y) / transform.scale;
+
+          // 计算缩放比例
+          let zoomFactor = 1.1; // 缩放因子
+          if (event.deltaY > 0) {
+            zoomFactor = 1 / zoomFactor; // 向下滚动时缩小
+          }
+
+          // 更新缩放比例
+          transform.scale *= zoomFactor;
+
+          // 重新计算缩放后的鼠标位置（相对于画布内容）
+          const newMouseX = prevMouseX * transform.scale;
+          const newMouseY = prevMouseY * transform.scale;
+
+          // 调整平移量，使缩放后鼠标位置不变
+          transform.x = mouseX - newMouseX;
+          transform.y = mouseY - newMouseY;
+
+          // 重新绘制
+          draw();
+        }
+      });
+    </script>
+  </body>
+</html>

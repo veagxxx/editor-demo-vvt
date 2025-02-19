@@ -3,7 +3,7 @@
 import { AppContext, ComponentPublicInstance, createVNode, isVNode, render, VNode } from 'vue';
 import MessageBoxComponent from './index.vue';
 import { isElement, isFunction, isObject, isString, isUndefined } from 'lodash-es';
-import { Action, Callback, IZMessageBox, MessageBoxData, ZMessageBoxOptions, ZMessageBoxShortcutMethod } from './message-box.type';
+import { Action, Callback, IZMessageBox, MessageBoxData, ZMessageBoxOptions, ZMessageBoxShortcutMethod, ZMessageBoxChainsMethod } from './message-box.type';
 
 const messageInstance = new Map<
   ComponentPublicInstance<{ doClose: () => void }>, // marking doClose as function
@@ -16,18 +16,18 @@ const messageInstance = new Map<
 >()
 
 const getAppendToElement = (props: any): HTMLElement => {
-  let appendTo: HTMLElement | null = document.body
+  let appendTo: HTMLElement | null = document.body;
   if (props.appendTo) {
     if (isString(props.appendTo)) {
-      appendTo = document.querySelector<HTMLElement>(props.appendTo)
+      appendTo = document.querySelector<HTMLElement>(props.appendTo);
     }
     if (isElement(props.appendTo)) {
-      appendTo = props.appendTo
+      appendTo = props.appendTo;
     }
 
     // should fallback to default value with a warning
     if (!isElement(appendTo)) {
-      appendTo = document.body
+      appendTo = document.body;
     }
   }
   return appendTo!;
@@ -71,7 +71,7 @@ const showMessage = (options: any, appContext?: AppContext | null) => {
 
   options.onAction = (action: Action) => {
     const currentMsg = messageInstance.get(vm)!;
-    let resolve: Action | { value: string; action: Action }
+    let resolve: Action | { value: string; action: Action };
     if (options.showInput) {
       resolve = { value: '', action };
     } else {
@@ -181,7 +181,71 @@ function messageBoxFactory(boxType: typeof MESSAGE_BOX_VARIANTS[number]) {
       appContext ?? null
     );
   }
+} 
+
+function messageChainsBoxFactory()
+{
+  const resolves: MessageBoxData[] = [];
+  const machiningMessageBox = async (options: ZMessageBoxOptions[]) =>
+  {
+    if (options.length === 0) {
+      const res = [...resolves];
+      resolves.length = 0;
+      // FIXME: resolve or reject
+      return res;
+    }
+    let option = options.shift()!;
+    let titleOrOpts = '';
+    if (isObject(option.title)) {
+      option = option.title as ZMessageBoxOptions;
+      titleOrOpts = '';
+    } else if (isUndefined(option.title)) {
+      titleOrOpts = '';
+    } else {
+      titleOrOpts = option.title as string;
+    }
+
+    try {
+      const res = await MessageBox(
+        Object.assign(
+          {
+            title: titleOrOpts,
+            message: option.message,
+          },
+          option,
+          {
+            boxType: 'chains',
+          }
+        ),
+      );
+      resolves.push(res);
+      if (option.confirmButtonActionDone) {
+        const res = [...resolves];
+        resolves.length = 0;
+        // FIXME: resolve or reject
+        return res; 
+      }
+    } catch (error: any) {
+      resolves.push(error);
+      if (option.cancelButtonActionDone) {
+        const res = [...resolves];
+        resolves.length = 0;
+        // FIXME: resolve or reject
+        return res; 
+      }
+    }
+    if (option.done) {
+      const res = [...resolves];
+      resolves.length = 0;
+      // FIXME: resolve or reject
+      return res; 
+    }
+    return machiningMessageBox(options);
+  };
+  return machiningMessageBox;
 }
+MessageBox.chains = messageChainsBoxFactory() as ZMessageBoxChainsMethod;
+
 MessageBox.close = () => {
 
   messageInstance.forEach((_, vm) => {

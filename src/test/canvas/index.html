@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OffscreenCanvas Example</title>
+</head>
+<body>
+  <canvas id="myCanvas" width="500" height="500"></canvas>
+
+  <script>
+    // 创建 Web Worker
+    const worker = new Worker('worker.js');
+
+    // 获取现有的 <canvas> 元素并将其转换为 OffscreenCanvas
+    const canvas = document.getElementById('myCanvas');
+    const offscreen = canvas.transferControlToOffscreen();
+
+    // 将 OffscreenCanvas 传递给 Worker
+    worker.postMessage({ offscreen }, [offscreen]);
+
+    // 监听 Worker 发送的消息
+    worker.onmessage = function(event) {
+      console.log(event.data);
+    };
+  </script>
+</body>
+</html>

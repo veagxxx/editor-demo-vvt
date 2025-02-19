@@ -5,7 +5,9 @@ import 'virtual:svg-icons-register';
 import SvgIcon from './components/svg-icon/index.vue';
 import 'element-plus/es/components/message/style/css';
 import 'element-plus/es/components/loading/style/css';
+import router from './router';
 import { createPinia } from 'pinia';
+import directives from './directives';
 // import installFFmpeg from './plugin/ffmpeg-plugin'; // ffmpeg 集成
 // import { ElLoading } from 'element-plus';
 import { useMock } from './mock';
@@ -17,8 +19,9 @@ const app = createApp(App);
 // app.config.globalProperties.$ElLoading = ElLoading.service({
 //   text: '核心加载中...'
 // });
+directives(app);
 const pinia = createPinia();
-app.use(pinia);
+app.use(pinia).use(router);
 // app.use(installFFmpeg);
 app.component('SvgIcon', SvgIcon);
 app.mount('#app');

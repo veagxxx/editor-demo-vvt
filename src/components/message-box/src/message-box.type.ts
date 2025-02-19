@@ -2,31 +2,45 @@ import { ComponentSize, ButtonType } from "element-plus"
 import { AppContext, Component, CSSProperties, VNode } from "vue"
 
 type MessageType = '' | 'success' | 'warning' | 'info' | 'error';
-export type Action = 'confirm' | 'close' | 'cancel';
-export type MessageBoxType = '' | 'prompt' | 'alert' | 'confirm';
+export type Action = 'confirm' | 'close' | 'cancel' | 'custom';
+export type MessageBoxType = '' | 'prompt' | 'alert' | 'confirm' | 'chains';
 export type MessageBoxData = MessageBoxInputData & Action
 export interface MessageBoxInputData {
   value: string
   action: Action
 }
 
-export interface ZMessageBoxFooter
+export interface ZMessageBoxButton
 {
-  buttonText: string;
-  buttonIcon?: string | Component;
+  text: string;
+  icon?: string | Component;
   disabled?: boolean;
-  buttonType?: ButtonType;
-  onClick?: (e: Event, done: () => void) => void;
+  type?: ButtonType;
+  onClick?: (action: string | undefined, done: () => void) => void;
   customClass?: string;
-  buttonSize?: ComponentSize;
-  action?: Action;
+  size?: ComponentSize;
+  action?: string;
   loading?: boolean;
+  loadingIcon?: string | Component;
   round?: boolean;
+  slot?: 'prepend' | 'append';
 }
+
+export type Footer = ((done: (action?: string) => void) => VNode) | null;
 
 export interface ZMessageBoxOptions
 {
-  footers?: ZMessageBoxFooter[];
+  /** extra button in footer */
+  buttons?: ZMessageBoxButton[];
+
+  done?: boolean;
+  
+  cancelButtonActionDone?: boolean;
+  confirmButtonActionDone?: boolean;
+
+  /** */
+  footer?: Footer;
+
   autofocus?: boolean
 
   /** Callback before MessageBox closes, and it will prevent MessageBox from closing */
@@ -126,7 +140,11 @@ export interface ZMessageBoxOptions
 
 export declare interface MessageBoxState
 {
-  footers: ZMessageBoxFooter[];
+  buttons: ZMessageBoxButton[];
+  cancelButtonActionDone: boolean;
+  confirmButtonActionDone: boolean;
+  done: boolean;
+  footer: Footer;
   autofocus: boolean
   title: string
   message: string
@@ -177,26 +195,37 @@ export type ZMessageBoxShortcutMethod = ((
     title: ZMessageBoxOptions['title'],
     options?: ZMessageBoxOptions,
     appContext?: AppContext | null
-  ) => Promise<MessageBoxData>)
+  ) => Promise<MessageBoxData>);
+
+export type ZMessageBoxChainsMethod = ((
+  message: ZMessageBoxOptions['message'],
+  options?: ZMessageBoxOptions,
+  appContext?: AppContext | null
+) => Promise<MessageBoxData>[]) &
+  ((
+    options: ZMessageBoxOptions[]
+  ) => Promise<MessageBoxData[]>);
 
 export interface IZMessageBox {
-  _context: AppContext | null
+  _context: AppContext | null;
 
   /** Show a message box */
   (
     options: ZMessageBoxOptions,
     appContext?: AppContext | null
-  ): Promise<MessageBoxData>
+  ): Promise<MessageBoxData>;
 
   /** Show an alert message box */
-  alert: ZMessageBoxShortcutMethod
+  alert: ZMessageBoxShortcutMethod;
 
   /** Show a confirm message box */
-  confirm: ZMessageBoxShortcutMethod
+  confirm: ZMessageBoxShortcutMethod;
 
   /** Show a prompt message box */
-  prompt: ZMessageBoxShortcutMethod
+  prompt: ZMessageBoxShortcutMethod;
+
+  chains: ZMessageBoxChainsMethod;
 
   /** Close current message box */
-  close(): void
+  close(): void;
 }
