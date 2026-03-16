@@ -1,7 +1,10 @@
-@forward "element-plus/theme-chalk/src/common/var.scss" with (
+// src/styles/element-variables.scss
+
+// 覆盖 Element Plus 的默认变量
+@use "element-plus/theme-chalk/src/common/var.scss" as * with (
   $colors: (
     "primary": (
-      "base": #4051B5,
-    )
+      "base": #7A75FF, // 你的主题色
+    ),
   ),
-)
+);

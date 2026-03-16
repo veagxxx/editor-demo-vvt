@@ -92,7 +92,7 @@ function emitChange(value: string)
 </script>
 <style lang="scss">
   .editor-segment-layout {
-    width: 600px;
+    width: 100%;
     height: 200px;
     display: flex;
     flex-direction: column;

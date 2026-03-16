@@ -8,7 +8,9 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AudioItem: typeof import('./src/components/track-timeline/components/template/AudioItem.vue')['default']
+    BreakTag: typeof import('./src/components/script-editor/nodes/break/BreakTag.vue')['default']
     CameraNodePanel: typeof import('./src/components/editor-segment/CameraNodePanel.vue')['default']
+    CameraTag: typeof import('./src/components/script-editor/nodes/camera/CameraTag.vue')['default']
     EditorSegment: typeof import('./src/components/editor-segment/index.vue')['default']
     EditorToolbar: typeof import('./src/components/editor-segment/EditorToolbar.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
@@ -25,6 +27,8 @@ declare module 'vue' {
     ElSelect: typeof import('element-plus/es')['ElSelect']
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
+    ElTooltip: typeof import('element-plus/es')['ElTooltip']
+    HMotionTag: typeof import('./src/components/script-editor/nodes/hmotion/HMotionTag.vue')['default']
     Loading: typeof import('./src/components/track-timeline/components/Loading.vue')['default']
     MotionNodePanel: typeof import('./src/components/editor-segment/MotionNodePanel.vue')['default']
     PauseNode: typeof import('./src/components/editor-segment/PauseNode.vue')['default']
@@ -32,10 +36,13 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SceneSelect: typeof import('./src/components/dict-select/components/SceneSelect.vue')['default']
+    ScriptEditor: typeof import('./src/components/script-editor/ScriptEditor.vue')['default']
     SegmentNode: typeof import('./src/components/editor-segment/SegmentNode.vue')['default']
+    SpeakTag: typeof import('./src/components/script-editor/nodes/speak/SpeakTag.vue')['default']
     SpeakText: typeof import('./src/components/editor-segment/SpeakText.vue')['default']
     Src: typeof import('./src/components/message-box/src/index.vue')['default']
     SvgIcon: typeof import('./src/components/svg-icon/index.vue')['default']
+    TagClose: typeof import('./src/components/script-editor/nodes/components/TagClose.vue')['default']
     TestTable: typeof import('./src/components/TestTable.vue')['default']
     Timeline: typeof import('./src/components/track-timeline/components/Timeline.vue')['default']
     TrackClip: typeof import('./src/components/track-timeline/components/TrackClip.vue')['default']
@@ -46,7 +53,11 @@ declare module 'vue' {
     TrackList: typeof import('./src/components/track-timeline/components/TrackList.vue')['default']
     TrackPlayPoint: typeof import('./src/components/track-timeline/components/TrackPlayPoint.vue')['default']
     TrackTimeline: typeof import('./src/components/track-timeline/index.vue')['default']
+    VideoClip: typeof import('./src/components/video-clip/index.vue')['default']
     VideoFrame: typeof import('./src/components/track-timeline/components/template/VideoFrame.vue')['default']
     VideoItem: typeof import('./src/components/track-timeline/components/template/VideoItem.vue')['default']
+  }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

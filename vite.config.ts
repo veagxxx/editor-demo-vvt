@@ -6,7 +6,6 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
 import * as path from 'path';
 import { viteMockServe } from 'vite-plugin-mock';
-
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd())
@@ -17,7 +16,12 @@ export default defineConfig(({ mode }) => {
         resolvers: [ElementPlusResolver()],
       }),
       Components({
-        resolvers: [ElementPlusResolver({ importStyle: "sass" })],
+        resolvers: [
+          ElementPlusResolver({
+            importStyle: "sass",
+            directives: true
+          })
+        ],
       }),
       // svg-icon
       createSvgIconsPlugin({
@@ -28,14 +32,16 @@ export default defineConfig(({ mode }) => {
       viteMockServe({
         mockPath: './src/mock',
         enable: true,
-      })
+      }),
     ],
     css: {
       preprocessorOptions: {
         scss: {
-          additionalData: `@use "@/assets/styles/element-plus/index.scss" as *;`
-        }
-      }
+          additionalData: `
+            @use "@/assets/styles/element-plus/index.scss" as *;
+          `,
+        },
+      },
     },
     optimizeDeps: {
       exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util']

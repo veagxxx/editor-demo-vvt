@@ -3,8 +3,8 @@ import './style.css';
 import App from './App.vue';
 import 'virtual:svg-icons-register';
 import SvgIcon from './components/svg-icon/index.vue';
-import 'element-plus/es/components/message/style/css';
-import 'element-plus/es/components/loading/style/css';
+import 'element-plus/theme-chalk/src/message.scss'
+import 'element-plus/theme-chalk/src/message-box.scss'
 import router from './router';
 import { createPinia } from 'pinia';
 import directives from './directives';

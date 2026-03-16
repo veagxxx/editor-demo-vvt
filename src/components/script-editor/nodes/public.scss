@@ -1,0 +1,21 @@
+.sc-node-tooltip
+{
+  font-size: 12px;
+  padding: 3px 8px;
+  &.is-error
+  {
+    span:first-child
+    {
+      &:before{
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        font-size: 24px;
+        vertical-align: middle;
+        margin-bottom: 3px;
+        content: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0Ij48cGF0aCBmaWxsPSIjZmZmZmZmIiBkPSJNNTEyIDY0YTQ0OCA0NDggMCAxIDEgMCA4OTZhNDQ4IDQ0OCAwIDAgMSAwLTg5Nm0wIDM5My42NjRMNDA3LjkzNiAzNTMuNmEzOC40IDM4LjQgMCAxIDAtNTQuMzM2IDU0LjMzNkw0NTcuNjY0IDUxMkwzNTMuNiA2MTYuMDY0YTM4LjQgMzguNCAwIDEgMCA1NC4zMzYgNTQuMzM2TDUxMiA1NjYuMzM2TDYxNi4wNjQgNjcwLjRhMzguNCAzOC40IDAgMSAwIDU0LjMzNi01NC4zMzZMNTY2LjMzNiA1MTJMNjcwLjQgNDA3LjkzNmEzOC40IDM4LjQgMCAxIDAtNTQuMzM2LTU0LjMzNnoiLz48L3N2Zz4=');
+      }
+    }
+  }
+
+}

@@ -1,0 +1,31 @@
+
+@mixin generate-tag-button($bgColor)
+{
+  position: relative;
+  bottom: 4px; /* 调整位置，使其距离底部边框约3px */
+  // display: inline-flex;
+  background-color: $bgColor;
+  border-radius: 4px;
+  padding: 2px 0 2px 6px;
+  font-size: 12px;
+  line-height: 12px;
+  cursor: pointer;
+  color: #1a1a1a;
+  align-items: center;
+  //vertical-align: text-bottom;
+
+  :deep(.el-tooltip__trigger)
+  {
+    // display: inline-flex;
+    // align-items: center;
+  }
+  :deep(.el-icon)
+  {
+    top: 2px;
+  }
+
+  &:hover
+  {
+    background-color: darken($bgColor, 10%);
+  }
+}
